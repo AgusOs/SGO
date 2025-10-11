@@ -12,6 +12,8 @@ namespace SGO.Infrastructure.Persistence.Configurations
             builder.HasKey(u => u.Id);
             builder.Property(u => u.Id)
                    .ValueGeneratedOnAdd();
+            builder.Property(u => u.Matricula)
+                   .IsRequired();
             builder.Property(u => u.Username)
                    .HasMaxLength(50)
                    .IsRequired();

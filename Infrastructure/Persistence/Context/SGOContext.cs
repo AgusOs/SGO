@@ -4,6 +4,7 @@ using SGO.Domain.Fichas;
 using SGO.Domain.Odontogramas;
 using SGO.Domain.Pacientes;
 using SGO.Domain.Procedimientos;
+using SGO.Domain.Turnos;
 
 namespace SGO.Infrastructure.Persistence.Context;
 
@@ -23,6 +24,7 @@ public class SGOContext : DbContext
     public DbSet<Odontograma> Odontogramas => Set<Odontograma>();
     public DbSet<User> Usuarios => Set<User>();
     public DbSet<Procedimiento> Procedimientos => Set<Procedimiento>();
+    public DbSet<Turno> Turnos => Set<Turno>();
 
     // --- Configuración global ---
     protected override void OnModelCreating(ModelBuilder modelBuilder)

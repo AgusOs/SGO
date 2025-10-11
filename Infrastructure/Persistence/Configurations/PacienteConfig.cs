@@ -21,9 +21,5 @@ public class PacienteConfig : IEntityTypeConfiguration<Paciente>
         builder.Property(p => p.ObraSocial).HasMaxLength(100);
         builder.Property(p => p.NumeroAfiliado).HasMaxLength(50);
         builder.Property(p => p.Observaciones).HasMaxLength(1000);
-
-        builder.HasMany(p => p.FichasClinicas)
-               .WithOne(f => f.Paciente)
-               .HasForeignKey(f => f.PacienteDocumento);
     }
 }

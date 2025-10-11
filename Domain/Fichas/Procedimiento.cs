@@ -1,44 +1,37 @@
-﻿namespace SGO.Domain.Procedimientos;
+﻿using SGO.Domain.Common;
+
+namespace SGO.Domain.Procedimientos;
 
 /// <summary>
-/// Clase base abstracta para cualquier procedimiento odontológico.
-/// Heredada por procedimientos específicos (Obturación, Extracción, Limpieza, etc.)
+/// Representa un tratamiento o práctica realizada dentro de una ficha clínica.
 /// </summary>
-public abstract class Procedimiento
+public sealed class Procedimiento : Entity
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
-    public DateTime Fecha { get; private set; }
-    public int PiezaFdi { get; private set; } // Pieza afectada (FDI)
-    public string? Superficie { get; private set; } // "M", "O", etc.
-    public string Profesional { get; private set; } = default!;
-    public string? Observaciones { get; private set; }
 
-    public EstadoProcedimiento Estado { get; private set; } = EstadoProcedimiento.Realizado;
+    public string Tipo { get; private set; } = default!;
+    public string? Descripcion { get; private set; }
+    public int? PiezaFdi { get; private set; }
+    public DateTime Fecha { get; private set; } = DateTime.UtcNow;
+    public int ProfesionalMatricula { get; private set; }
 
-    protected Procedimiento() { }
+    private Procedimiento() { } // EF
 
-    protected Procedimiento(DateTime fecha, int piezaFdi, string profesional,
-                            EstadoProcedimiento estado = EstadoProcedimiento.Realizado,
-                            string? superficie = null, string? observaciones = null)
+    private Procedimiento(string tipo, string? descripcion, int? piezaFdi, int profesionalMatricula)
     {
-        Fecha = fecha;
+        if (string.IsNullOrWhiteSpace(tipo))
+            throw new ArgumentException("El tipo de procedimiento es obligatorio.", nameof(tipo));
+
+        Tipo = tipo.Trim();
+        Descripcion = descripcion?.Trim();
         PiezaFdi = piezaFdi;
-        Profesional = profesional.Trim();
-        Estado = estado;
-        Superficie = superficie?.ToUpperInvariant();
-        Observaciones = observaciones?.Trim();
+        ProfesionalMatricula = profesionalMatricula;
+        Fecha = DateTime.UtcNow;
     }
 
-    public abstract string Tipo { get; }
+    public static Procedimiento Crear(string tipo, string? descripcion, int? piezaFdi, int profesionalMatricula)
+        => new(tipo, descripcion, piezaFdi, profesionalMatricula);
 
-    public void CambiarEstado(EstadoProcedimiento nuevoEstado)
-    {
-        Estado = nuevoEstado;
-    }
-}
-
-public enum EstadoProcedimiento
-{
-    Pendiente,   // Representa color rojo en el odontograma
-    Realizado    // Representa color azul en el odontograma
+    public override string ToString()
+        => $"{Tipo} ({PiezaFdi?.ToString() ?? "sin pieza"}) - {Descripcion}";
 }

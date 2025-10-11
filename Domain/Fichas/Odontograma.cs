@@ -21,9 +21,32 @@ public sealed class Odontograma : Entity
         InicializarPiezas();
     }
 
+    /// <summary>
+    /// Crea un nuevo odontograma vacío para una ficha clínica.
+    /// </summary>
     public static Odontograma CrearNuevo(Guid fichaClinicaId)
+        => new(fichaClinicaId);
+
+    /// <summary>
+    /// Crea un odontograma a partir del estado de las piezas recibido desde el front.
+    /// </summary>
+    public static Odontograma CrearDesdePiezas(Guid fichaClinicaId, IEnumerable<PiezaDentalDto> piezasDto)
     {
-        return new Odontograma(fichaClinicaId);
+        var odontograma = new Odontograma(fichaClinicaId);
+
+        odontograma._piezas.Clear(); // Reemplazamos el set inicializado
+        foreach (var dto in piezasDto)
+        {
+            var pieza = PiezaDental.Nueva(dto.Fdi);
+            pieza.CambiarSuperficie("M", Enum.Parse<SuperficieEstado>(dto.M));
+            pieza.CambiarSuperficie("D", Enum.Parse<SuperficieEstado>(dto.D));
+            pieza.CambiarSuperficie("V", Enum.Parse<SuperficieEstado>(dto.V));
+            pieza.CambiarSuperficie("L", Enum.Parse<SuperficieEstado>(dto.L));
+            pieza.CambiarSuperficie("O", Enum.Parse<SuperficieEstado>(dto.O));
+            odontograma._piezas.Add(pieza);
+        }
+
+        return odontograma;
     }
 
     private void InicializarPiezas()
@@ -46,6 +69,9 @@ public sealed class Odontograma : Entity
     }
 }
 
+/// <summary>
+/// Representa una pieza dental con su estado general y el de cada superficie.
+/// </summary>
 public sealed class PiezaDental
 {
     public int Fdi { get; private set; }
@@ -79,3 +105,8 @@ public sealed class PiezaDental
 
 public enum DienteEstado { Presente, Ausente, Implante, Corona, Endodoncia }
 public enum SuperficieEstado { Sana, Caries, Obturada, Sellada, Fracturada, Desgastada }
+
+/// <summary>
+/// DTO auxiliar usado para construir el odontograma desde el Controller.
+/// </summary>
+public record PiezaDentalDto(int Fdi, string M, string D, string V, string L, string O);

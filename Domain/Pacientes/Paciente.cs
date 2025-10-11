@@ -37,10 +37,6 @@ public sealed class Paciente : Entity
     public string? Medicacion { get; private set; }
     public string? Observaciones { get; private set; }
 
-    // --- Historial de fichas clínicas ---
-    private readonly List<FichaClinica> _fichasClinicas = new();
-    public IReadOnlyCollection<FichaClinica> FichasClinicas => _fichasClinicas.AsReadOnly();
-
     // --- Historial de turnos (solo lectura) ---
     private readonly List<Turno> _turnos = new();
     public IReadOnlyCollection<Turno> Turnos => _turnos.AsReadOnly();
@@ -160,13 +156,6 @@ public sealed class Paciente : Entity
         EnMedicacion = enMedicacion;
         Medicacion = medicacion?.Trim();
         Observaciones = observaciones?.Trim();
-    }
-
-    public void AgregarFichaClinica(FichaClinica ficha)
-    {
-        if (ficha is null)
-            throw new ArgumentNullException(nameof(ficha));
-        _fichasClinicas.Add(ficha);
     }
 
     /// Verifica si el paciente tiene inasistencias en el último mes

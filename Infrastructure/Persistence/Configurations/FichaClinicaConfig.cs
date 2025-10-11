@@ -26,7 +26,7 @@ public class FichaClinicaConfig : IEntityTypeConfiguration<FichaClinica>
                .IsRequired();
 
         builder.HasOne(f => f.Paciente)
-               .WithMany(p => p.FichasClinicas)
+               .WithMany()
                .HasForeignKey(f => f.PacienteDocumento)
                .OnDelete(DeleteBehavior.Restrict);
 
