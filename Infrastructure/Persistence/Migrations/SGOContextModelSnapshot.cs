@@ -22,9 +22,44 @@ namespace SGO.Infrastructure.Persistence.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.Users.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("varchar(5)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<uint>("Version")
+                        .HasColumnType("int unsigned");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("users", (string)null);
+                });
+
             modelBuilder.Entity("SGO.Domain.Fichas.FichaClinica", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Diagnostico")
@@ -36,8 +71,8 @@ namespace SGO.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("MotivoConsulta")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("varchar(250)");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<string>("Observaciones")
                         .HasMaxLength(1000)
@@ -53,10 +88,6 @@ namespace SGO.Infrastructure.Persistence.Migrations
                     b.Property<int>("ProfesionalMatricula")
                         .HasColumnType("int");
 
-                    b.Property<string>("TratamientosRealizados")
-                        .HasMaxLength(2000)
-                        .HasColumnType("varchar(2000)");
-
                     b.Property<Guid>("TurnoId")
                         .HasColumnType("char(36)");
 
@@ -66,6 +97,10 @@ namespace SGO.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PacienteDocumento");
+
+                    b.HasIndex("ProfesionalMatricula");
+
+                    b.HasIndex("TurnoId");
 
                     b.ToTable("fichas_clinicas", (string)null);
                 });
@@ -96,21 +131,42 @@ namespace SGO.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<bool>("Cardiaco")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("DetalleAlergias")
                         .HasColumnType("longtext");
 
                     b.Property<string>("DetalleEnfermedad")
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("Diabetico")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(150)
                         .HasColumnType("varchar(150)");
+
+                    b.Property<bool>("EnMedicacion")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("EnfermedadSistemica")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateOnly?>("FechaNacimiento")
                         .HasColumnType("date");
+
+                    b.Property<bool>("Hepatitis")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("Hipertenso")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Medicacion")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("Mononucleosis")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -141,12 +197,117 @@ namespace SGO.Infrastructure.Persistence.Migrations
                     b.ToTable("pacientes", (string)null);
                 });
 
+            modelBuilder.Entity("SGO.Domain.Procedimientos.Procedimiento", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("varchar(13)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("FichaClinicaId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PiezaFdi")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Profesional")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Superficie")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FichaClinicaId");
+
+                    b.ToTable("procedimientos", (string)null);
+
+                    b.HasDiscriminator().HasValue("Procedimiento");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("SGO.Domain.Turnos.Turno", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime>("FechaHora")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Motivo")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int>("PacienteDocumento")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProfesionalMatricula")
+                        .HasColumnType("int");
+
+                    b.Property<uint>("Version")
+                        .HasColumnType("int unsigned");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PacienteDocumento");
+
+                    b.ToTable("turnos", (string)null);
+                });
+
+            modelBuilder.Entity("SGO.Domain.Procedimientos.Extraccion", b =>
+                {
+                    b.HasBaseType("SGO.Domain.Procedimientos.Procedimiento");
+
+                    b.Property<bool>("Quirurgica")
+                        .HasColumnType("tinyint(1)");
+
+                    b.ToTable("procedimientos");
+
+                    b.HasDiscriminator().HasValue("Extraccion");
+                });
+
+            modelBuilder.Entity("SGO.Domain.Procedimientos.Limpieza", b =>
+                {
+                    b.HasBaseType("SGO.Domain.Procedimientos.Procedimiento");
+
+                    b.Property<bool>("ConProfilaxis")
+                        .HasColumnType("tinyint(1)");
+
+                    b.ToTable("procedimientos");
+
+                    b.HasDiscriminator().HasValue("Limpieza");
+                });
+
             modelBuilder.Entity("SGO.Domain.Fichas.FichaClinica", b =>
                 {
                     b.HasOne("SGO.Domain.Pacientes.Paciente", "Paciente")
                         .WithMany("FichasClinicas")
                         .HasForeignKey("PacienteDocumento")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Paciente");
@@ -215,15 +376,38 @@ namespace SGO.Infrastructure.Persistence.Migrations
                     b.Navigation("Piezas");
                 });
 
+            modelBuilder.Entity("SGO.Domain.Procedimientos.Procedimiento", b =>
+                {
+                    b.HasOne("SGO.Domain.Fichas.FichaClinica", null)
+                        .WithMany("Procedimientos")
+                        .HasForeignKey("FichaClinicaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SGO.Domain.Turnos.Turno", b =>
+                {
+                    b.HasOne("SGO.Domain.Pacientes.Paciente", "Paciente")
+                        .WithMany("Turnos")
+                        .HasForeignKey("PacienteDocumento")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Paciente");
+                });
+
             modelBuilder.Entity("SGO.Domain.Fichas.FichaClinica", b =>
                 {
                     b.Navigation("Odontograma")
                         .IsRequired();
+
+                    b.Navigation("Procedimientos");
                 });
 
             modelBuilder.Entity("SGO.Domain.Pacientes.Paciente", b =>
                 {
                     b.Navigation("FichasClinicas");
+
+                    b.Navigation("Turnos");
                 });
 #pragma warning restore 612, 618
         }

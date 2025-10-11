@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SGO.Domain.Pacientes;
+﻿using Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using SGO.Domain.Fichas;
 using SGO.Domain.Odontogramas;
+using SGO.Domain.Pacientes;
+using SGO.Domain.Procedimientos;
 
 namespace SGO.Infrastructure.Persistence.Context;
 
@@ -19,6 +21,8 @@ public class SGOContext : DbContext
     public DbSet<Paciente> Pacientes => Set<Paciente>();
     public DbSet<FichaClinica> FichasClinicas => Set<FichaClinica>();
     public DbSet<Odontograma> Odontogramas => Set<Odontograma>();
+    public DbSet<User> Usuarios => Set<User>();
+    public DbSet<Procedimiento> Procedimientos => Set<Procedimiento>();
 
     // --- Configuración global ---
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SGO.Domain.Fichas;
 using SGO.Domain.Odontogramas;
+using SGO.Domain.Procedimientos;
 
 namespace SGO.Infrastructure.Persistence.Configurations;
 
@@ -11,52 +12,39 @@ public class FichaClinicaConfig : IEntityTypeConfiguration<FichaClinica>
     {
         builder.ToTable("fichas_clinicas");
 
-        // --- Clave primaria ---
         builder.HasKey(f => f.Id);
 
-        // --- Propiedades principales ---
-        builder.Property(f => f.Id)
-               .ValueGeneratedNever();
-
-        builder.Property(f => f.PacienteDocumento)
-               .IsRequired();
-
-        builder.Property(f => f.ProfesionalMatricula)
-               .IsRequired();
-
-        builder.Property(f => f.TurnoId)
-               .IsRequired();
-
         builder.Property(f => f.MotivoConsulta)
-               .HasMaxLength(250)
+               .HasMaxLength(500)
                .IsRequired();
 
-        builder.Property(f => f.Diagnostico)
-               .HasMaxLength(1000);
-
-        builder.Property(f => f.TratamientosRealizados)
-               .HasMaxLength(2000);
-
-        builder.Property(f => f.Prescripciones)
-               .HasMaxLength(1000);
-
-        builder.Property(f => f.Observaciones)
-               .HasMaxLength(1000);
-
+        builder.Property(f => f.Diagnostico).HasMaxLength(1000);
+        builder.Property(f => f.Prescripciones).HasMaxLength(1000);
+        builder.Property(f => f.Observaciones).HasMaxLength(1000);
         builder.Property(f => f.FechaCreacionUtc)
                .HasColumnType("datetime")
                .IsRequired();
 
-        // --- Relación N:1 con Paciente ---
         builder.HasOne(f => f.Paciente)
                .WithMany(p => p.FichasClinicas)
                .HasForeignKey(f => f.PacienteDocumento)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
 
-        // --- Relación 1:1 con Odontograma ---
         builder.HasOne(f => f.Odontograma)
                .WithOne()
                .HasForeignKey<Odontograma>(o => o.FichaClinicaId)
                .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(f => f.Procedimientos)
+               .WithOne()
+               .HasForeignKey("FichaClinicaId")
+               .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(f => f.Procedimientos)
+               .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasIndex(f => f.PacienteDocumento);
+        builder.HasIndex(f => f.ProfesionalMatricula);
+        builder.HasIndex(f => f.TurnoId);
     }
 }
